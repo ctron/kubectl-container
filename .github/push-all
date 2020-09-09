@@ -39,3 +39,5 @@ for version in $("${SCRIPTDIR}/all-versions"); do
     fi
 
 done
+
+push_image latest
