@@ -13,7 +13,7 @@ jobs:
   build:
 
     name: build
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
 
     strategy:
       matrix:
@@ -47,10 +47,10 @@ jobs:
       - name: Push to github container repository
         run: |
           IMAGE_ID=ghcr.io/${{ github.repository_owner }}/${IMAGE_NAME}
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          IMAGE_ID=$(echo ${IMAGE_ID} | tr '[A-Z]' '[a-z]')
 
-          docker tag ${IMAGE_NAME} $IMAGE_ID:${{ matrix.version }}
-          docker push $IMAGE_ID:${{ matrix.version }}
+          docker tag ${IMAGE_NAME} ${IMAGE_ID}:${{ matrix.version }}
+          docker push ${IMAGE_ID}:${{ matrix.version }}
 
       - name: Login to quay.io
         env:
@@ -60,10 +60,10 @@ jobs:
       - name: Push to quay.io
         run: |
           IMAGE_ID=quay.io/${{ secrets.QUAY_USER }}/${IMAGE_NAME}
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          IMAGE_ID=$(echo ${IMAGE_ID} | tr '[A-Z]' '[a-z]')
 
-          docker tag ${IMAGE_NAME} $IMAGE_ID:${{ matrix.version }}
-          docker push $IMAGE_ID:${{ matrix.version }}
+          docker tag ${IMAGE_NAME} ${IMAGE_ID}:${{ matrix.version }}
+          docker push ${IMAGE_ID}:${{ matrix.version }}
 
       - name: Login to docker.io
         run: echo "${{ secrets.DOCKER_TOKEN }}" | docker login https://docker.io -u "${{ secrets.DOCKER_USER }}" --password-stdin
@@ -71,7 +71,7 @@ jobs:
       - name: Push to docker.io
         run: |
           IMAGE_ID=docker.io/${{ secrets.DOCKER_USER }}/${IMAGE_NAME}
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          IMAGE_ID=$(echo ${IMAGE_ID} | tr '[A-Z]' '[a-z]')
 
-          docker tag ${IMAGE_NAME} $IMAGE_ID:${{ matrix.version }}
-          docker push $IMAGE_ID:${{ matrix.version }}
+          docker tag ${IMAGE_NAME} ${IMAGE_ID}:${{ matrix.version }}
+          docker push ${IMAGE_ID}:${{ matrix.version }}
