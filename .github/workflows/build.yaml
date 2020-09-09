@@ -74,4 +74,4 @@ jobs:
           IMAGE_ID=$(echo ${IMAGE_ID} | tr '[A-Z]' '[a-z]')
 
           docker tag ${IMAGE_NAME} ${IMAGE_ID}:${{ matrix.version }}
-          docker push ${IMAGE_ID}:${{ matrix.version }}
+          docker -l debug push ${IMAGE_ID}:${{ matrix.version }}
