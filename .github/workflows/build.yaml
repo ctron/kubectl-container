@@ -29,7 +29,7 @@ jobs:
 
       - name: Build container
         run: |
-          docker build . --tag ${IMAGE_NAME} --build-arg=${{ matrix.version }}
+          docker build . --tag ${IMAGE_NAME} --build-arg VERSION="${{ matrix.version }}"
 
       - name: Verify version
         if: ${{ matrix.version != 'latest' }}
