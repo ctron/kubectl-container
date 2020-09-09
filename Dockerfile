@@ -1,0 +1,15 @@
+FROM registry.access.redhat.com/ubi8-minimal
+
+ARG VERSION=latest
+
+RUN true \
+  && set -e \
+  && set -o pipefail \
+  && if [ $VERSION == "latest" ]; then \
+    VERSION="$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)" ;\
+  fi \
+  && echo "Version: ${VERSION}" \
+  && curl -sL -o /usr/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v${VERSION}/bin/linux/amd64/kubectl \
+  && chmod a+x /usr/bin/kubectl
+
+ENTRYPOINT [ "/usr/bin/kubectl" ]
