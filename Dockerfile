@@ -11,7 +11,7 @@ RUN true \
     VERSION="v${VERSION}" ;\
   fi \
   && echo "Version: ${VERSION}" \
-  && curl -sL -o /usr/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/${VERSION}/bin/linux/amd64/kubectl \
+  && curl -sSL -o /usr/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/${VERSION}/bin/linux/amd64/kubectl \
   && chmod a+x /usr/bin/kubectl
 
 ENTRYPOINT [ "/usr/bin/kubectl" ]
