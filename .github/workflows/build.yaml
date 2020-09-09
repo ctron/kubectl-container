@@ -7,6 +7,7 @@ on:
 
 env:
   IMAGE_NAME: kubectl
+  QUAY_BOT: "+github"
 
 jobs:
 
@@ -32,11 +33,22 @@ jobs:
           docker build . --tag $IMAGE_NAME --build-arg=${{ matrix.version }}
 
       - name: Login to github container repository
-        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login https://ghcr.io -u ${{ github.actor }} --password-stdin
+        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login https://ghcr.io -u "${{ github.actor }}" --password-stdin
 
-      - name: Push latest to github container repository
+      - name: Push to github container repository
         run: |
           IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+
+          docker tag $IMAGE_NAME $IMAGE_ID:${{ matrix.version }}
+          docker push $IMAGE_ID:${{ matrix.version }}
+
+      - name: Login to quay.io
+        run: echo "${{ secrets.QUAY_TOKEN }}" | docker login https://quay.io -u "${{ secrets.QUAY_USER }}${QUAY_BOT}" --password-stdin
+
+      - name: Push to quay.io
+        run: |
+          IMAGE_ID=quay.io/${{ secrets.QUAY_USER }}/$IMAGE_NAME
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
 
           docker tag $IMAGE_NAME $IMAGE_ID:${{ matrix.version }}
