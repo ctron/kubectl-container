@@ -11,7 +11,7 @@ for version in $("${SCRIPTDIR}/all-versions"); do
 
     # test if this version exists
 
-    if [[ $(curl -XHEAD https://storage.googleapis.com/kubernetes-release/release/${version}/bin/linux/amd64/kubectl -I 2>/dev/null |head -1 | awk '{print $2}') != "200" ]]; then
+    if [[ $(curl -XHEAD https://storage.googleapis.com/kubernetes-release/release/v${version}/bin/linux/amd64/kubectl -I 2>/dev/null |head -1 | awk '{print $2}') != "200" ]]; then
         echo "${version}: is missing"
         continue
     fi
