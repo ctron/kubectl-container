@@ -7,7 +7,6 @@ on:
 
 env:
   IMAGE_NAME: kubectl
-  QUAY_BOT: "+github"
 
 jobs:
 
@@ -30,26 +29,46 @@ jobs:
 
       - name: Build container
         run: |
-          docker build . --tag $IMAGE_NAME --build-arg=${{ matrix.version }}
+          docker build . --tag ${IMAGE_NAME} --build-arg=${{ matrix.version }}
+
+      - name: Verify version
+        if: ${{ matrix.version != 'latest' }}
+        run: |
+          set -e
+          set -x
+          test "$(docker run --rm -t ${IMAGE_NAME} version --client --short)" == "Client Version: v${VERSION}"
 
       - name: Login to github container repository
         run: echo "${{ secrets.GHCR_TOKEN }}" | docker login https://ghcr.io -u "${{ github.actor }}" --password-stdin
 
       - name: Push to github container repository
         run: |
-          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
+          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/${IMAGE_NAME}
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
 
-          docker tag $IMAGE_NAME $IMAGE_ID:${{ matrix.version }}
+          docker tag ${IMAGE_NAME} $IMAGE_ID:${{ matrix.version }}
           docker push $IMAGE_ID:${{ matrix.version }}
 
       - name: Login to quay.io
+        env:
+          QUAY_BOT: "+github"
         run: echo "${{ secrets.QUAY_TOKEN }}" | docker login https://quay.io -u "${{ secrets.QUAY_USER }}${QUAY_BOT}" --password-stdin
 
       - name: Push to quay.io
         run: |
-          IMAGE_ID=quay.io/${{ secrets.QUAY_USER }}/$IMAGE_NAME
+          IMAGE_ID=quay.io/${{ secrets.QUAY_USER }}/${IMAGE_NAME}
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
 
-          docker tag $IMAGE_NAME $IMAGE_ID:${{ matrix.version }}
+          docker tag ${IMAGE_NAME} $IMAGE_ID:${{ matrix.version }}
+          docker push $IMAGE_ID:${{ matrix.version }}
+
+      - name: Login to docker.io
+        run: echo "${{ secrets.DOCKER_TOKEN }}" | docker login https://docker.io -u "${{ secrets.DOCKER_USER }}" --password-stdin
+
+      - name: Push to docker.io
+        run: |
+          IMAGE_ID=docker.io/${{ secrets.DOCKER_USER }}/${IMAGE_NAME}
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+
+          docker tag ${IMAGE_NAME} $IMAGE_ID:${{ matrix.version }}
           docker push $IMAGE_ID:${{ matrix.version }}
