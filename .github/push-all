@@ -7,22 +7,29 @@ set -o pipefail
 : ${IMAGE_NAME:=kubectl}
 
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+REPOS=$@
 
-for version in $("${SCRIPTDIR}/all-versions"); do
+function push_image {
+    echo -n "Pushing $1: "
 
-    echo -n "Pushing ${version}: "
+    for repo in "$REPOS"; do
 
-    for repo in "$@"; do
-
-        #echo -n "$(echo $repo | perl -n -e '/^([^\/]+).*/ && print $1'), "
-
-        IMAGE_ID="$repo:$version"
-        echo -n "$IMAGE_ID, "
-        docker tag "$IMAGE_NAME" "$IMAGE_ID" &>> push.log
-        docker push "$IMAGE_ID" &>> push.log
+        IMAGE_ID="$repo:$1"
+        echo -n "${IMAGE_ID}, "
+        docker tag "${IMAGE_NAME}:${1}" "${IMAGE_ID}" &>> push.log
+        docker push "${IMAGE_ID}" &>> push.log
 
     done
 
     echo "done!"
+}
+
+for version in $("${SCRIPTDIR}/all-versions"); do
+
+    push_image $version
+
+    if [[ "$version" == *.0 ]]; then
+      push_image $(echo $version | awk -F. '{print $1 "." $2}')
+    fi
 
 done
