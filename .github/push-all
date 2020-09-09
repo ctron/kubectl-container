@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+set -o pipefail
+
+: ${IMAGE_NAME:=kubectl}
+
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+for version in $("${SCRIPTDIR}/all-versions"); do
+
+    echo -n "Pushing ${version}: "
+
+    for repo in "$@"; do
+
+        #echo -n "$(echo $repo | perl -n -e '/^([^\/]+).*/ && print $1'), "
+
+        IMAGE_ID="$repo:$version"
+        echo -n "$IMAGE_ID, "
+        docker tag "$IMAGE_NAME" "$IMAGE_ID" &>> push.log
+        docker push "$IMAGE_ID" &>> push.log
+
+    done
+
+    echo "done!"
+
+done

@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+set -o pipefail
+
+: ${IMAGE_NAME:=kubectl}
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+for version in $("${SCRIPTDIR}/all-versions"); do
+
+    echo -n "${version}: building, "
+    docker build .  -t "${IMAGE_NAME}" --build-arg VERSION="${version}" &>> build.log
+
+    echo -n "testing, "
+
+    ACTUAL="$(docker run --rm -t ${IMAGE_NAME} version --client --short | tr -d '\r\n')"
+    EXPECTED="Client Version: v${version}"
+    #echo "Actual: '${ACTUAL}'"
+    #echo "Expected: '${EXPECTED}'"
+    test "${ACTUAL}" == "${EXPECTED}"
+
+    echo "done!"
+
+done
