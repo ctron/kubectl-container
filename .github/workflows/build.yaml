@@ -36,7 +36,11 @@ jobs:
         run: |
           set -e
           set -x
-          test "$(docker run --rm -t ${IMAGE_NAME} version --client --short)" == "Client Version: v${VERSION}"
+          ACTUAL="$(docker run --rm -t ${IMAGE_NAME} version --client --short)"
+          EXPECTED="Client Version: v${VERSION}"
+          echo "Actual: '${ACTUAL}'"
+          echo "Expected: '${EXPECTED}'"
+          test "${ACTUAL}" == "${EXPECTED}"
 
       - name: Login to github container repository
         run: echo "${{ secrets.GHCR_TOKEN }}" | docker login https://ghcr.io -u "${{ github.actor }}" --password-stdin
