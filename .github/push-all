@@ -11,14 +11,14 @@ REPOS=$@
 
 function push_image {
 
-    if ! docker image exists "${IMAGE_NAME}:${1}"; then
+    if [[ "$(docker images -q ${IMAGE_NAME}:${1} 2> /dev/null)" == "" ]]; then
         echo "Skipping missing version: $1"
         return
     fi
 
     echo -n "Pushing $1: "
 
-    for repo in "$REPOS"; do
+    for repo in $REPOS; do
 
         IMAGE_ID="$repo:$1"
         echo -n "${IMAGE_ID}, "
