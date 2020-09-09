@@ -29,7 +29,9 @@ for version in $("${SCRIPTDIR}/all-versions"); do
 
     echo "done!"
 
-    # create the short tag
+    # push the short tag forward
     docker tag "${IMAGE_NAME}:${version}" "${IMAGE_NAME}:$(echo $version | awk -F. '{print $1 "." $2}')" &>> build.log
+    # push the latest tag forward
+    docker tag "${IMAGE_NAME}:${version}" "${IMAGE_NAME}:latest" &>> build.log
 
 done
