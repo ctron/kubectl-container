@@ -70,7 +70,7 @@ jobs:
 
       - name: Push to docker.io
         run: |
-          IMAGE_ID=docker.io/${{ secrets.DOCKER_USER }}/${IMAGE_NAME}
+          IMAGE_ID=docker.io/${{ github.repository_owner }}/${IMAGE_NAME}
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
 
           docker tag ${IMAGE_NAME} $IMAGE_ID:${{ matrix.version }}
