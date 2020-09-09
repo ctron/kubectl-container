@@ -35,7 +35,7 @@ jobs:
         if: ${{ matrix.version != 'latest' }}
         run: |
           set -e
-          ACTUAL="$(docker run --rm -t ${IMAGE_NAME} version --client --short)"
+          ACTUAL="$(docker run --rm -t ${IMAGE_NAME} version --client --short | tr -d '\r\n')"
           EXPECTED="Client Version: v${{ matrix.version }}"
           echo "Actual: '${ACTUAL}'"
           echo "Expected: '${EXPECTED}'"
