@@ -1,6 +1,6 @@
 FROM registry.access.redhat.com/ubi8-minimal
 
-# Install jq from EPEL, directly
+LABEL org.opencontainers.image.source="https://github.com/ctron/kubectl-container"
 
 RUN true \
   && microdnf -y install jq
