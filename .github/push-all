@@ -4,7 +4,7 @@ set -e
 set -u
 set -o pipefail
 
-: ${IMAGE_NAME:=kubectl}
+: "${IMAGE_NAME:=kubectl}"
 
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 REPOS=$@
@@ -32,10 +32,10 @@ function push_image {
 
 for version in $("${SCRIPTDIR}/all-versions"); do
 
-    push_image $version
+    push_image "$version"
 
     if [[ "$version" == *.0 ]]; then
-      push_image $(echo $version | awk -F. '{print $1 "." $2}')
+      push_image "$(echo $version | awk -F. '{print $1 "." $2}')"
     fi
 
 done
