@@ -3,10 +3,7 @@ FROM registry.access.redhat.com/ubi8-minimal
 # Install jq from EPEL, directly
 
 RUN true \
-  && curl -sSL http://mirror.centos.org/centos/8/AppStream/x86_64/os/Packages/jq-1.5-12.el8.x86_64.rpm -o jq.rpm \
-  && curl -sSL http://mirror.centos.org/centos/8/AppStream/x86_64/os/Packages/oniguruma-6.8.2-1.el8.x86_64.rpm -o onig.rpm \
-  && rpm -Uvh onig.rpm jq.rpm \
-  && rm onig.rpm jq.rpm
+  && microdnf -y install jq
 
 ARG VERSION=latest
 
