@@ -32,7 +32,7 @@ for version in $("${SCRIPTDIR}/all-micro-versions" "$VERSION"); do
     # push the short tag forward
     docker tag "${IMAGE_NAME}:${version}" "${IMAGE_NAME}:$(echo $version | awk -F. '{print $1 "." $2}')" &>> build.log
 
-    if [[ -n "$LATEST" ]]; then
+    if [[ "$LATEST" == "true" ]]; then
       # push the latest tag forward
       docker tag "${IMAGE_NAME}:${version}" "${IMAGE_NAME}:latest" &>> build.log
     fi

@@ -40,6 +40,6 @@ for version in $("${SCRIPTDIR}/all-micro-versions" "$VERSION"); do
 
 done
 
-if [[ -n "$LATEST" ]]; then
+if [[ "$LATEST" == "true" ]]; then
   push_image latest
 fi
