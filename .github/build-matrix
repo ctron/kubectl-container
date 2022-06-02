@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+set -o pipefail
+
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+VERSIONS=$("$SCRIPTDIR/all-minor-versions")
+
+echo "$VERSIONS" | jq --arg latest "$(echo "$VERSIONS" | tail -n1)" -ncR '[inputs] | map({version: ., latest: ($latest == .)})' | jq -c '{ include: . }'

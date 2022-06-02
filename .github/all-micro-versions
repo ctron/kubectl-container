@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -e
+set -o pipefail
+
+VERSION="$1"
+if [[ -z "$VERSION" ]]; then
+  echo "Missing version parameter."
+  exit 1
+fi
+
+# enable unknown variables after checking
+set -u
+
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+"$SCRIPTDIR/all-versions" | grep -E "^$VERSION"

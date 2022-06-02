@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+set -o pipefail
+
+: "${IMAGE_NAME:=kubectl}"
+
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+REPOS=$@
+
+function push_image {
+
+    if [[ "$(docker images -q ${IMAGE_NAME}:${1} 2> /dev/null)" == "" ]]; then
+        echo "Skipping missing version: $1"
+        return
+    fi
+
+    echo -n "Pushing $1: "
+
+    for repo in $REPOS; do
+
+        IMAGE_ID="$repo:$1"
+        echo -n "${IMAGE_ID}, "
+        docker tag "${IMAGE_NAME}:${1}" "${IMAGE_ID}" &>> push.log
+        docker push "${IMAGE_ID}" &>> push.log
+
+    done
+
+    echo "done!"
+}
+
+for version in $("${SCRIPTDIR}/all-micro-versions" "$VERSION"); do
+
+    push_image "$version"
+
+    if [[ "$version" == *.0 ]]; then
+      push_image "$(echo $version | awk -F. '{print $1 "." $2}')"
+    fi
+
+done
+
+if [[ -n "$LATEST" ]]; then
+  push_image latest
+fi

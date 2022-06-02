@@ -13,10 +13,25 @@ env:
 
 jobs:
 
+  versions:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Evaluate build matrix
+        id: eval-matrix
+        run: |
+          echo "::set-output name=matrix::"$(.github/build-matrix | sed -e "s/'/'\\\\''/g; 1s/^/'/; \$s/\$/'/" )
+
   build:
 
-    name: build
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
+    needs: [ "versions" ]
+
+    strategy:
+      matrix: ${{ fromJson(needs.versions.outputs.eval-matrix) }}
 
     steps:
 
@@ -34,13 +49,19 @@ jobs:
       - name: Login to docker.io
         run: echo "${{ secrets.DOCKER_TOKEN }}" | docker login https://index.docker.io/v1/ -u "${{ secrets.DOCKER_USER }}" --password-stdin
 
-      - name: Build all versions
+      - name: Build micro versions of ${{ matrix.version }}
+        env:
+          VERSION: ${{ matrix.version }}
+          LATEST: ${{ matrix.latest }}
         run: |
-          .github/build-all
+          .github/build-minor ${{ matrix.version }} ${{ matrix.latest }}
 
       - name: Push all versions
+        env:
+          VERSION: ${{ matrix.version }}
+          LATEST: ${{ matrix.latest }}
         run: |
-          .github/push-all ghcr.io/${{ github.repository_owner }}/${IMAGE_NAME} quay.io/${{ secrets.QUAY_USER }}/${IMAGE_NAME} docker.io/${{ secrets.DOCKER_USER }}/${IMAGE_NAME}
+          .github/push-minor ghcr.io/${{ github.repository_owner }}/${IMAGE_NAME} quay.io/${{ secrets.QUAY_USER }}/${IMAGE_NAME} docker.io/${{ secrets.DOCKER_USER }}/${IMAGE_NAME}
 
       - name: Upload logs
         uses: actions/upload-artifact@v2

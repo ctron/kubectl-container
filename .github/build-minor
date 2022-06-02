@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+set -o pipefail
+
+: "${IMAGE_NAME:=kubectl}"
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+for version in $("${SCRIPTDIR}/all-micro-versions" "$VERSION"); do
+
+    # test if this version exists
+
+    if [[ $(curl -XHEAD "https://storage.googleapis.com/kubernetes-release/release/v${version}/bin/linux/amd64/kubectl" -I 2>/dev/null |head -1 | awk '{print $2}') != "200" ]]; then
+        echo "${version}: is missing"
+        continue
+    fi
+
+    echo -n "${version}: building, "
+    docker build .  -t "${IMAGE_NAME}:${version}" --build-arg VERSION="${version}" &>> build.log
+
+    echo -n "testing, "
+
+    ACTUAL="$(docker run --rm -t "${IMAGE_NAME}:${version}" version --client --output json | jq .clientVersion.gitVersion -r)"
+    EXPECTED="v${version}"
+    echo "Actual: '${ACTUAL}'" &>> build.log
+    echo "Expected: '${EXPECTED}'" &>> build.log
+    test "${ACTUAL}" == "${EXPECTED}"
+
+    echo "done!"
+
+    # push the short tag forward
+    docker tag "${IMAGE_NAME}:${version}" "${IMAGE_NAME}:$(echo $version | awk -F. '{print $1 "." $2}')" &>> build.log
+
+    if [[ -n "$LATEST" ]]; then
+      # push the latest tag forward
+      docker tag "${IMAGE_NAME}:${version}" "${IMAGE_NAME}:latest" &>> build.log
+    fi
+
+done
