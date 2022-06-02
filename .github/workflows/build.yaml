@@ -25,7 +25,7 @@ jobs:
       - name: Evaluate build matrix
         id: eval-matrix
         run: |
-          matrix=$(.github/build-matrix | LC_ALL=C sed -e 's/[^a-zA-Z0-9,._+@%/-]/\\&/g; 1{$s/^$/""/}; 1!s/^/"/; $!s/$/"/' )
+          matrix=$(.github/build-matrix)
           echo "$matrix"
           echo "::set-output name=matrix::$matrix"
 
