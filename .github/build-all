@@ -21,8 +21,8 @@ for version in $("${SCRIPTDIR}/all-versions"); do
 
     echo -n "testing, "
 
-    ACTUAL="$(docker run --rm -t "${IMAGE_NAME}:${version}" version --client --short | tr -d '\r\n')"
-    EXPECTED="Client Version: v${version}"
+    ACTUAL="$(docker run --rm -t "${IMAGE_NAME}:${version}" version --client --output json | jq .clientVersion.gitVersion -r)"
+    EXPECTED="v${version}"
     echo "Actual: '${ACTUAL}'" &>> build.log
     echo "Expected: '${EXPECTED}'" &>> build.log
     test "${ACTUAL}" == "${EXPECTED}"
