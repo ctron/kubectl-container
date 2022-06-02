@@ -29,6 +29,12 @@ jobs:
           echo "$matrix"
           echo "::set-output name=matrix::$matrix"
 
+      - name: Show build matrix
+        env:
+          MATRIX: ${{ steps.eval-matrix.outputs.matrix }}
+        run: |
+          echo ${MATRIX}
+
   build:
 
     runs-on: ubuntu-22.04
