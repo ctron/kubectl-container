@@ -15,6 +15,8 @@ jobs:
 
   versions:
     runs-on: ubuntu-22.04
+    outputs:
+      matrix: ${{ steps.eval-matrix.outputs.matrix }}
 
     steps:
       - name: Checkout
@@ -33,7 +35,7 @@ jobs:
     needs: [ "versions" ]
 
     strategy:
-      matrix: ${{ fromJson(needs.versions.outputs.eval-matrix) }}
+      matrix: ${{ fromJson(needs.versions.outputs.matrix) }}
 
     steps:
 
