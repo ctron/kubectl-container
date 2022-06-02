@@ -24,6 +24,7 @@ jobs:
         id: eval-matrix
         run: |
           matrix=$(.github/build-matrix | sed -e "s/'/'\\\\''/g; 1s/^/'/; \$s/\$/'/" )
+          echo "$matrix"
           echo "::set-output name=matrix::$matrix"
 
   build:
